@@ -1,0 +1,1277 @@
+<!--告知浏览器重要性。-->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<!--响应式-->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<script src="http://cdn.static.runoob.com/libs/angular.js/1.4.6/angular.min.js"></script>
+<script src="http://cdn.static.runoob.com/libs/angular.js/1.4.6/angular-animate.min.js"></script>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+
+<script type="text/javascript" async src="https://platform.twitter.com/widgets.js"></script>
+
+
+
+<style type="text/css">
+/*ng means angular*/
+    .ng-invalid.ng-touched {
+            border-color: red;
+        }
+    .ng-invalid.ng-dirty{
+            border-color: red;
+        }
+
+	#map{
+		width: 68vw;
+		height: 50vh;
+	}
+	#streetview{
+		width: 1060px;
+		height: 400px;
+	}
+	.card-columns {
+    	column-count: 4;
+  	}
+    /*当屏幕宽度小于768时，响应式设计*/
+  	@media screen and (max-width: 768px){
+  		.card-columns {
+    		column-count: 1;
+  		}
+  	}
+/*    position relative 是absolute基于的位置，如果有relative的元素，后面的absolute则基于relative的位置。*/
+    #results{
+        position: relative;
+    }
+    #details{
+        position: relative;
+    }
+ng-hide意味着这一段被隐藏，是一个属性，remove意味完成这个动作的动画。active意味着完成动画。
+#results.ng-hide-remove{
+    transition: 0.5s linear;
+    left: 100vw;
+}
+
+#results.ng-hide-remove-active{
+    left: 8vw;
+}
+#details.ng-hide-remove{
+    transition: 0.5s linear;
+    left: -100vw;
+}
+
+#details.ng-hide-remove-active{
+    left: 8vw;
+}
+
+
+#reviewscontent.ng-hide-remove{
+    transition: 0.2s linear;
+    opacity: 0;
+}
+
+#reviewscontent.ng-hide-remove-active{
+    opacity: 1;
+}
+
+
+</style>
+
+</head>
+
+<body>
+<p></p>
+<!--ng-app意味着整个div都应用angular,ng-controller相当于函数模块，操作的对象相当于ng-app。所有的自定义的function在ng-controller-->
+<div class="container" ng-app="myApp" ng-controller="siteCtrl">
+<div class="container">
+<div class="container">
+<!--name相当于把前段数据传到后端，获取前段数据-->
+<!--border指的是边框-->
+<!--form相当于发送到后端的东西-->
+<form role="form" name="myform" novalidate onsubmit="return false;" style="background-color: rgb(248,248,248); border-width: 1px; border-style:solid;border-color: rgb(204,204,204);border-radius: 10px;">
+    <br>
+    <div class="row">
+        <div  class="col-md-12  header">
+            <h4>
+              <p class="text-center" style="font-size: 25px;">Travel and Entertainment Search</p>
+            </h4>
+        </div>
+    </div>
+
+    <div class="form-group row"> 
+    	<div class="col-md-2 "></div>      
+        <label for="keyword" class="col-md-2" >Keyword<span style="color: red">*</span></label>
+
+        <div class="col-md-6 ">
+<!--ng-model是双向绑定view和model，ng-blur是点进去又点出来-->
+            <input type="text" class="form-control" id="keyword" name="keyword" ng-model="keyword" required  ng-blur="change=true">
+            <span style="color:red"  ng-show="myform.keyword.$invalid&&myform.keyword.$dirty&&change">Please enter a keyword</span>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col-md-2 "></div>
+        <label for="category" class="col-md-2 ">Category</label>
+        <div class="col-md-4 ">
+        <select class="form-control" id="category" name="category" ng-model="category">
+            <option value="default">Default</option>
+            <option value="airport">Airport</option>
+            <option value="amusement_park">Amusement Park</option>
+            <option value="aquarium">Aquarium</option>
+            <option value="art_gallery">Art Gallery</option>
+            <option value="bakery">Bakery</option>
+            <option value="bar">Bar</option>
+            <option value="beauty_salon">Beauty Salon</option>
+            <option value="bowling_alley">Bowling Alley</option>
+            <option value="bus_station">Bus Station</option>
+            <option value="cafe">Cafe</option>
+            <option value="campground">Campground</option>
+            <option value="car_rental">Car Rental</option>
+            <option value="casino">Casino</option>
+            <option value="lodging">Lodging</option>
+            <option value="movie_theater">Movie Theater</option>
+            <option value="museum">Museum</option>
+            <option value="night_club">Night Club</option>
+            <option value="park">Park</option>
+            <option value="parking">Parking</option>
+            <option value="restaurant">Restaurant</option>
+            <option value="shopping_mall">Shopping Mall</option>
+            <option value="stadium">Stadium</option>
+            <option value="subway_station">Subway Station</option>
+            <option value="taxi_stand">Taxi Stand</option>
+            <option value="train_station">Train Station</option>
+            <option value="transit_station">Transit Station</option>
+            <option value="travel_agency">Travel Agency</option>
+            <option value="zoo">Zoo</option>
+        </select>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col-md-2 "></div>
+        <label for="distance" class="col-md-2 ">Distance (miles)</label>
+        <div class="col-md-4 ">
+<!--placeholder意味着默认值，当text什么都没有输入时，text会默认为10-->
+            <input type="text" class="form-control" formcontrolname id="distance" ng-model="distance" name="distance" placeholder="10">
+        </div>
+    </div>
+
+
+    <div class="form-group row">   
+        <div class="col-md-2 "></div>
+        <label for="location" class="col-md-2  col-form-label">From<span class="requiredField" style="color: red">*</span></label>
+        <div class="col-md-6 ">
+            <div class="radio">   
+                <label><input type="radio" id="locationa" name="location" value="current" checked="from" ng-click="radio_disable();">Current location</label>
+            </div>
+
+            <div class="radio">
+                <label><input type="radio" name="location" id="locationb" value="somewhere" ng-click="radio_disable();">Other. Please specify:</label>              
+                <input type="text" name="otherlocation" class="form-control" id="otherlocation" ng-model="otherlocation" disabled="" placeholder="Enter a location" style=""  required ng-blur="change1=true">
+                <span style="color:red;" ng-hide="(myform.otherlocation.$pristine) || myform.otherlocation.$valid" ng-show="myform.otherlocation.$invalid&&change1">Please enter a location</span>
+            </div>           
+        </div>
+    </div>
+
+    <div class="form-group row">  
+        <div class="col-md-12  offset-md-2" >
+            <div class="col-md-2 "></div>
+<!--btn btn-primary是bootstrap里面button的特性-->
+            <button ng-disabled="(myform.keyword.$invalid)||(myform.otherlocation.$invalid&&chosen)||(!iplocation)" class="btn btn-primary" id="search"  ng-click="searchplace();"><i class="fa fa-search"></i> Search</button>
+            <button style="border-color: rgb(204,204,204);" class="btn btn-default" id="clear" ng-click="clearall();">Clear</button>
+            
+            
+        </div>
+    </div> 
+    <br>    
+</form>
+</div>
+
+<br>
+
+<div class="container text-center" style="margin-top: 20px;">
+<!--    流动性排版，bootstrap排版更好看-->
+    <div class="container-fluid " style="margin-bottom: 25px;">
+            <button class="btn btn-primary resultsbutton"  ng-click="showresults();">Results</button>
+            <button class="btn favoritesbutton"  ng-click="showfavorite();" >Favorites</button>
+    </div>   
+</div>
+
+<div class="container" ng-show="progressbar">
+	<div class='progress'>
+		<div class='progress-bar progress-bar-striped progress-bar-animated' style='width: 50%;'></div>
+	</div>
+</div>
+
+<div ng-show="favoritesoption">
+  <div class="container">
+
+    <div ng-show="favoriteslist" ng-hide="favoritepage.length==0">
+    <div>
+        <button class="btn btn-default pull-right" ng-disabled="Detailsdisable" ng-click="details()">Details <i class="fa fa-angle-right" style="font-size:20px;"></i></button>
+    </div>
+<!-- table-hover意思是当hover的时候会变色，而table-responsive是当放在手机上会响应式-->
+    <table class='table table-hover table-responsive' >
+        <thead>
+            <tr><th>#favor</th><th>Category</th><th>Name</th><th>Address</th><th>Favorite</th><th>Details</th></tr>
+        </thead>
+        <tbody>
+<!--ng-repeat相当于for循环-->
+            <tr ng-repeat="x in favoritepage" >
+<!--$index是ng-repeat的iterator offset of the repeated element.-->
+            <td style="min-width: 10%; vertical-align: middle !important;">{{$index+1}}</td>
+            <td style="min-width: 20%;vertical-align: middle !important;"><img src="{{x.icon}}"></td>
+            <td style="min-width: 30%;vertical-align: middle !important;">{{x.name}}</td>
+            <td style="min-width: 30%;vertical-align: middle !important;">{{x.vicinity}}</td>
+            <td style="min-width: 5%;vertical-align: middle !important;"><button style="border-color: rgb(204,204,204);" class='btn btn-default' ng-click="deletefavorites($index)"><i class="fa fa-trash" aria-hidden="true"></i></button></td>
+            <td style="min-width: 5%;vertical-align: middle !important;"><button style="border-color: rgb(204,204,204);" class='btn btn-default' ng-click="showdetails(x.place_id)"><i class="fa fa-angle-right" style="font-size:20px"></i></button></td>
+            </tr>
+        </tbody>
+    </table>
+    </div>
+
+    <div class="container" ng-show="favoritepage.length==0" >
+        <table  class='table'><tr class='table-warning'><td>No records.</td></tr></table>
+    </div>
+  </div>
+</div>
+
+
+<div  ng-show="resultsoption">
+<div id="aaa" style="display: none;">
+  <div id="results" class="container" ng-show="searchtable">
+    <div>
+        <button style="border-color: rgb(204,204,204);" class="btn btn-default pull-right" ng-disabled="Detailsdisable" ng-click="details()">Details <i class="fa fa-angle-right" style="font-size:20px;"></i></button>
+    </div>
+
+	<table class='table table-hover table-responsive' style="min-width: 100%;">
+		<thead>
+			<tr><th>#</th><th>Category</th><th>Name</th><th>Address</th><th>Favorite</th><th>Details</th></tr>
+		</thead>
+		<tbody>
+  			<tr class="tablerow" id="{{x.place_id}}" ng-repeat="x in page" style="min-width: 100%;">
+    		<td style="min-width: 10%; vertical-align: middle !important;">{{$index+1}}</td>
+    		<td style="min-width: 20%; vertical-align: middle !important;"><img src="{{x.icon}}"></td>
+    		<td style="min-width: 30%; vertical-align: middle !important;">{{x.name}}</td>
+    		<td style="min-width: 30%; vertical-align: middle !important;">{{x.vicinity}}</td>
+
+    		<td style="min-width: 5%; vertical-align: middle !important;"><button style="border-color: rgb(204,204,204);" class='btn btn-default' ng-click="storeplace(x.place_id,x.icon,x.name,x.vicinity)"><i class="fa fa-star-o"></i></button></td>
+
+    		<td style="min-width: 5%;vertical-align: middle !important;"><button style="border-color: rgb(204,204,204);" class='btn btn-default' ng-click="showdetails(x.place_id)"><i class="fa fa-angle-right" style="font-size:20px"></i></button></td>
+  			</tr>
+  		</tbody>
+	</table>
+	
+    <div class="text-center inline-block">
+	   <button style="border-color: rgb(204,204,204);" class="btn btn-default" ng-click="previous()" ng-show="prebtn">previous</button>
+	   <button style="border-color: rgb(204,204,204);" class="btn btn-default" ng-click="next()" ng-show="nxtbtn">next</button>
+    </div>
+  </div>
+</div>	    
+</div>  <!-- resultsoption !-->
+
+
+<div id="details" class="container" ng-show="placedetail">
+    <div align="center">
+        <h3 ng-model="placename" id="placename"></h3>
+    </div>
+    <div>
+       <button style="border-color: rgb(204,204,204);" class="btn btn-default" ng-click="list()"><i class="fa fa-angle-left" style="font-size:20px"></i> list</button>
+       <div class="pull-right">
+           <button style="border-color: rgb(204,204,204);" class='btn btn-default'><i class="fa fa-star-o"></i></button>
+           <a href="{{twitterurl}}"><img style="width: 33.6px;height: 33.6px;" src="http://cs-server.usc.edu:45678/hw/hw8/images/Twitter.png"></a>
+       </div>
+    </div>
+    <br>
+    <div class="container" >
+<!-- The <ul> tag defines an unordered (bulleted) list.-->
+<!--        Tabs are created with <ul class="nav nav-tabs">-->
+        <ul class="nav nav-tabs justify-content-end" role="tablist">
+<!--            Add data-toggle="tab" to each tab, and add a .tab-pane class with a unique ID for every tab and wrap them in a .tab-content class.-->
+            <li id="infoli" class="nav-item"><a class="nav-link active" data-toggle="tab" href="#info">Info</a></li>
+            <li id="photosli" class="nav-item"><a class="nav-link" data-toggle="tab" href="#photos">Photos</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#direction">Map</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#reviews">Reviews</a></li>     
+        </ul>
+    </div>
+    <br>
+    
+    <div class="tab-content">
+       <div id="info" class="container tab-pane active">
+            <div id="infotable"></div>
+<!--The Modal plugin is a dialog box/popup window that is displayed on top of the current page:-->
+<!--           the .fade class adds a transition effect which fades the modal in and out.-->
+            <div class="modal fade" id="mymodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Open hours</h4>
+                        </div>
+                        <div class="modal-body">
+                            <table class="table">
+                                <tbody>
+                                    <tr id="day0"></tr>
+                                    <tr id="day1"></tr>
+                                    <tr id="day2"></tr>
+                                    <tr id="day3"></tr>
+                                    <tr id="day4"></tr>
+                                    <tr id="day5"></tr>
+                                    <tr id="day6"></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal -->
+            </div>
+
+       </div>
+
+       <div id="photos" class="container tab-pane"></div>
+
+       <div id="direction" class="container tab-pane">
+           <form class="form" name="mapform">
+               <div class="row">
+                <div class="col-lg-3">
+                    <label class="form-label" >From</label>
+                    <!--onFocus代表聚焦，点进去。-->
+                    <input type="text" class="form-control" id="startlocation" name="startpoint" ng-model="startpoint" onFocus="geolocate()" required>
+                </div>
+                <div class="col-lg-3">
+                    <label class="form-label" >To</label>           
+                    <input type="text" class="form-control" id="endlocation" readonly="" ng-model="endpoint">
+                </div>
+                <div class="col-lg-3">
+                    <label class="form-label">Travel Mode</label>
+                    <select class="form-control" id="travelmode" ng-model="travelmode">
+                        <option value="DRIVING">Driving</option>
+                        <option value="BICYCLING">Bicycling</option>
+                        <option value="TRANSIT">Transit</option>
+                        <option value="WALKING">Walking</option>    
+                    </select>
+                </div>
+                <div class="col-lg-3">
+                    <label class="form-label">   </label>
+                    <button class="btn btn-primary" style="margin-top: 32px;" ng-click="getdirection()" ng-disabled="mapform.startpoint.$error.required"  >Get Directions</button>
+                </div>
+            </div>
+           </form>
+          <br>
+          <div style="width: 37px;border-width: 1px;border-color: rgb(204,204,204);border-style:solid;">
+              <img id="pegman" style="width: 33.6px;height: 33.6px;" src="http://cs-server.usc.edu:45678/hw/hw8/images/Pegman.png" ng-click="showstreetview()">
+          </div>
+          <br>
+          <div id="map" class="text-center"></div>
+          <div id=""></div>
+          <div id="directionsPanel"></div>
+       </div>
+
+       <div id="reviews" class="container tab-pane">
+        <div class="container row">
+            <div class="dropdown">
+                <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" id="googleoryelp" style="background-color:rgb(134,142,150);color:white;">
+<!--也是双向绑定的一种，绑定值-->
+                {{reviewssource}}
+                </button>
+
+                <div class="dropdown-menu">
+                <a class="dropdown-item" ng-click="showgooglereviews()">Google Reviews</a>
+                <a class="dropdown-item" ng-click="showyelpreviews()">Yelp Reviews</a>
+                </div>
+                
+            </div>
+            <div style="width: 30px;"></div>
+            <div class="dropdown">
+                <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" style="background-color:rgb(134,142,150);color:white;">
+<!--双向绑定的一种{{}}-->
+                {{ordertype}}
+                </button>
+                <div class="dropdown-menu">
+                <a class="dropdown-item" ng-click="defaultorder()">Default Order</a>
+                <a class="dropdown-item" ng-click="highestrating()">Highest Rating</a>
+                <a class="dropdown-item" ng-click="lowestrating()">Lowest Rating</a>
+                <a class="dropdown-item" ng-click="mostrecent()">Most Recent</a>
+                <a class="dropdown-item" ng-click="leastrecent()">Least Recent</a>
+                </div>
+            </div>
+        </div>
+        <div id="reviewscontent" ng-show="reviewscontent">
+            <div class="media" ng-repeat="y in whichreviews | orderBy:a:b" style="background-color: rgb(248,248,248); border-width: 1px; border-style:solid;border-color: rgb(204,204,204);border-radius: 10px;margin-top: 10px; padding: 15px;">
+                
+                <div class="media-left">
+                    <a href="{{y.website}}" target="_blank"><img class="meida-object img-circle" src="{{y.image}}" style="width: 50px;height: 50px; border-radius:25px;"></a>
+                </div>
+
+                <div class="media-body" style="margin-left: 10px;">
+                    <a class="media-heading" href="{{y.website}}" target="_blank">{{y.name}}</a>
+                    <div>
+                        <p id='star' style="overflow: hidden;color:orange;width:{{y.rating*widthofonestar}}px; float: left">&#9733&#9733&#9733&#9733&#9733</p>
+                        <span style="color:grey;">{{y.createtime}}</span>
+                        <p style="clear: both;"></p>
+                    </div>   
+                    <p>{{y.text}}</p>
+                </div>
+                
+
+            </div>
+
+            <div class="container" ng-show="noreviews">
+                <table class='table'><tr class='table-warning'><td>No records.</td></tr></table>
+            </div>
+
+        </div>
+        <div style="height: 50vh; background-color: red;visibility: hidden;"></div>
+       </div>
+    </div> <!-- tab-content !-->
+</div>
+    <div class="container" ng-show="norecords" >
+        <table  class='table'><tr class='table-warning'><td>No records.</td></tr></table>
+    </div>
+    <div class="container" ng-show="failed">
+        <table class='table'><tr class='table-danger'><td>Failed to get search results.</td></tr></table>
+    </div>
+</div>
+
+<span id="hiddenstar" style="visibility: hidden;">&#9733</span>
+
+</div>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDpwobkPxkUkpKZdboGYuqdlwjoMK-s2-o&libraries=places&callback=initAutocomplete" async defer></script>
+
+<script>
+
+
+
+
+var app = angular.module('myApp', ['ngAnimate']);
+	
+app.controller('siteCtrl', function($scope, $http,$timeout) {
+    $scope.widthofonestar=document.getElementById('hiddenstar').offsetWidth;
+    console.log($scope.widthofonestar);
+
+
+    //host="http://localhost:8081";
+    host="http://ywsapp-envnodejs.us-east-2.elasticbeanstalk.com";
+    $scope.iplocation=false;
+    $scope.change = false;
+    $scope.change1 = false;
+
+    $scope.favoritepage=[];
+	$scope.resultsoption=true;
+    $scope.searchtable=true;
+	//$scope.keyword="usc";
+    $scope.drop="dropdown";
+    
+	$scope.category="default";
+	$scope.from=false;
+	//$scope.progressbar=false
+	$scope.page;
+	$scope.travelmode="DRIVING";
+    $scope.Detailsdisable=true;
+    $scope.placedetail=false;
+    $scope.reviewscontent=true;
+    $scope.reviewssource="Google Reviews";
+    $scope.ordertype="Default Order";
+
+//    splice是数组里面删除的意思，index是从哪里开始删除，第二个参数是删除几个的意思。
+    $scope.deletefavorites=function(index){
+        console.log(index);
+        $scope.favoritepage.splice(index,1);
+    }
+	$scope.showfavorite=function(){
+		$scope.resultsoption=false;
+		$scope.favoritesoption=true;
+        if($scope.favoritepage.length==0){
+            $scope.nofavorites=true;
+        }else{
+            $scope.nofavorites=false;
+            $scope.favoriteslist=true;
+        }
+        $scope.placedetail=false;
+        $(".resultsbutton").removeClass("btn-primary");
+        $(".favoritesbutton").addClass("btn-primary");
+	}
+	$scope.showresults=function(){
+        $scope.searchtable=true;
+		$scope.resultsoption=true;
+		$scope.favoritesoption=false;
+        //$scope.placedetail=false;
+        //$scope.searchtable=true;
+        $(".favoritesbutton").removeClass("btn-primary");
+        $(".resultsbutton").addClass("btn-primary");
+	}
+
+
+	$scope.clearall=function(){
+        $scope.change=false;
+        $scope.change1=false;
+        $scope.chosen=false;
+        //localStorage.clear();
+        
+		$scope.keyword="";
+        //document.getElementById('keyword').value="";
+		$scope.progressbar=false;
+		$scope.category="default";
+		$scope.distance="";
+		$scope.otherlocation="";
+        //document.getElementById('otherlocation').value="";
+		$scope.from=true;
+        
+        console.log($scope.change);
+		var radios=document.getElementsByName("location");
+            radios[0].checked="checked";        
+            document.getElementById("otherlocation").setAttribute("disabled","disabled");
+            $scope.placedetail=false;
+            $scope.searchtable=false;
+            $scope.norecords=false;
+            $scope.failed=false;
+        $(".favoritesbutton").removeClass("btn-primary");
+        $(".resultsbutton").addClass("btn-primary");
+        $scope.favoritesoption=false;
+	}
+
+	$scope.next=function(){	
+		if($scope.currentpage<$scope.allpage.length-1){
+				$scope.currentpage++;
+				if($scope.currentpage==$scope.allpage.length-1&&$scope.nptoken==null){
+					$scope.nxtbtn=false;
+				}
+				$scope.page=$scope.allpage[$scope.currentpage];
+				$scope.prebtn=true;
+				return;
+		}
+		if($scope.nptoken!=null&&$scope.currentpage==$scope.allpage.length-1){
+		$http.get(host+'/nextpage/'+$scope.nptoken)
+		.then(function (response1) {
+                console.log(host+'/nextpage/'+$scope.nptoken)
+//                代表http没有获得ok的信号，因此代表断网
+				if(response1.data.status!="OK"){
+					$scope.failed=true;
+					$scope.searchtable=false;
+					return;
+				}
+				if(!response1.data.hasOwnProperty("next_page_token")){
+					$scope.nxtbtn=false;
+					$scope.nptoken=null;
+				}
+				else{
+					$scope.nptoken=response1.data.next_page_token;
+				}
+                console.log(response1.data)
+				$scope.page2 = response1.data.results;
+                console.log($scope.page2)
+				$scope.allpage.push($scope.page2);
+                console.log($scope.allpage)
+				$scope.currentpage++;
+				$scope.page=$scope.allpage[$scope.currentpage];
+				$scope.prebtn=true;
+				return;
+		},function (response) {
+			console.log("error");
+            $scope.progressbar=false;
+            $scope.failed=true;
+		  });
+	    }
+	    else{
+		  $scope.nxtbtn=false;
+	    }
+	}
+
+    
+
+    $scope.defaultorder=function(){
+        $scope.a="";
+        $scope.b="";
+        $scope.ordertype="Default Order";
+    }
+
+    $scope.highestrating=function(){
+        $scope.a="rating";
+        $scope.b=1;
+        $scope.ordertype="Highest Rating"
+    }
+
+    $scope.lowestrating=function(){
+        $scope.a="rating";
+        $scope.b=0;
+        $scope.ordertype="Lowest Rating";
+    }
+    $scope.mostrecent=function(){
+        $scope.a="createtime";
+        $scope.b=1;
+        $scope.ordertype="Most Recent";
+    }
+    $scope.leastrecent=function(){
+        $scope.a="createtime";
+        $scope.b=0;
+        $scope.ordertype="Least Recent";
+    }
+
+    $scope.showgooglereviews=function(){
+        $scope.reviewscontent=false;
+        $scope.whichreviews=$scope.googlereviews;
+        if($scope.whichreviews.length!=0){
+            $scope.noreviews=false;
+        }    
+        $scope.reviewssource="Google Reviews";
+        //time out函数为延迟函数显示，延迟300ms。
+        $timeout(function() {
+              $scope.reviewscontent=true;
+            }, 300);
+    }
+
+    $scope.showyelpreviews=function(){
+        $scope.reviewscontent=false; 
+        $scope.reviewssource="Yelp Reviews";
+        $scope.whichreviews=$scope.yelpreviews; 
+        if($scope.whichreviews.length==0){
+            $scope.noreviews=true;
+        }
+        $timeout(function() {
+              $scope.reviewscontent=true;
+            }, 300);
+        
+    }
+
+	$scope.previous=function(){
+		$scope.nxtbtn=true;
+		$scope.currentpage--;
+		$scope.page=$scope.allpage[$scope.currentpage];
+		if($scope.currentpage==0){
+			$scope.prebtn=false;
+		}
+	}
+
+    $scope.list=function(){
+        $scope.placedetail=false;
+        $scope.searchtable=true;
+        
+    }
+
+    $scope.details=function(){
+        $scope.searchtable=false;
+        $scope.placedetail=true;
+    }
+
+    $scope.storeplace=function(id,icon,name,vicinity){
+        
+        var temp={
+            "place_id":id,
+            "icon":icon,
+            "name":name,
+            "vicinity":vicinity,
+        };
+        //console.log(temp);
+        //localStorage.setItem(temp);
+        
+        $scope.favoritepage.push(temp);
+        
+        //console.log(localStorage);
+    }
+
+	$scope.showdetails=function(place_id){
+        $(".tablerow").removeClass("table-warning");
+        $("#"+place_id).addClass("table-warning");
+        $scope.favoritesoption=false;
+		$scope.searchtable=false;
+        $scope.progressbar=true;
+        //document.getElementById('aaa').display="none";
+		$scope.info_active=true;
+		$scope.info_show=true;
+        $scope.Detailsdisable=false;
+        $scope.reviewssource="Google Reviews";
+        $scope.ordertype="Default Order";
+        $scope.a="";
+        $scope.b="";
+		//console.log(place_id);
+
+		var request = {
+  			placeId: place_id
+			};
+		//            A Nearby Search lets you search for places within a specified area by keyword or type. A Nearby Search must always include a location, which can be specified in one of two ways: a LatLngBounds.
+//                          a circular area defined as the combination of the location property — specifying the center of the circle as a LatLng object — and a radius, measured in meters.
+//        A Places Nearby search is initiated with a call to the PlacesService's nearbySearch() method, which will return an array of PlaceResult objects.
+		service = new google.maps.places.PlacesService(document.getElementById('map'));
+		service.getDetails(request, callback);
+
+		function callback(place, status) {
+  			if (status == google.maps.places.PlacesServiceStatus.OK) {
+                $scope.progressbar=false;
+  				endpointlat=place.geometry.location.lat();
+  				endpointlng=place.geometry.location.lng();
+                position=place.geometry.location;
+  				map = new google.maps.Map(document.getElementById('map'), {
+          			center: {lat: endpointlat, lng: endpointlng},
+          			zoom: 15
+        		});
+        		//console.log(place.geometry.location.lat());
+        		var marker = new google.maps.Marker({
+              		map: map,
+              		position: position,
+            	});
+
+            	$scope.endpoint=place.name+", "+place.formatted_address;
+            	//streetviews
+            	astorPlace = {lat: place.geometry.location.lat(), lng: place.geometry.location.lng()};
+            	$scope.isstreet=false;
+
+    		//$scope.address=place.formatted_address;
+    		//$scope.phonenumber=place.international_phone_number;
+    		//$scope.pricelevel=place.price_level;
+    		//$scope.rating=place.rating;
+    		//$scope.googlepage=place.url;
+    		//$scope.website=place.website;
+    		//console.log($scope.phonenumber);
+
+            //get twitterurl ready
+            //https://twitter.com/intent/tweet?hashtags=TravelAndEntertainmentSearch&text=Check out%20located%20at&url=https%3A%2F%2Fexample.com%2Ffoo
+            $scope.twitterurl="https://twitter.com/intent/tweet?hashtags=TravelAndEntertainmentSearch";
+            $scope.twitterurl+="&text=Check out "+place.name.replace("#","%23")+" located at "+place.formatted_address.replace("#","%23")+"."+"&url=";
+            if(place.hasOwnProperty("website")){
+                $scope.twitterurl+=place.website;
+            }
+            else{
+                $scope.twitterurl+=place.url;
+            }
+//            a method you call to get your bindings to update.
+    		$scope.$apply();
+    		/*
+	<table class="table table-striped">
+		<tbody>
+			<tr id="addressrow"><td><b>Address</b></td><td id="address">{{address}}</td></tr>
+			<tr id="phonenumberrow"><td><b>Phone Number</b></td><td id="phonenumber">{{phonenumber}}</td></tr>
+			<tr id="pricelevelrow"><td><b>Price Level</b></td><td id="pricelevel">{{pricelevel}}</td></tr>
+			<tr id="ratingrow"><td><b>Rating</b></td><td id="rating">{{rating}}</td></tr>
+			<tr id="googlepagerow"><td><b>Google Page</b></td><td id="googlepage"><a target="blank" href="{{googlepage}}">{{googlepage}}</a></td></tr>
+			<tr id="websiterow"><td><b>Website</b></td><td id="website"><a target="blank" href="{{website}}">{{website}}</a></td></tr>
+			<tr id="hoursrow"><td><b>Hours</b></td><td id="hours"></td></tr>
+		</tbody>
+	</table>
+    		*/
+            //info
+    		document.getElementById("placename").innerHTML=place.name;
+//                The .table-striped class adds zebra-stripes to a table
+    		info_text="<table class='table table-striped table-responsive'><tbody>";
+    		if(place.hasOwnProperty("formatted_address")){info_text+="<tr><td style='min-width:20vw;'><b>Address</b></td><td style='min-width:46vw;'>"+place.formatted_address+"</td></tr>"}	
+    		if(place.hasOwnProperty("international_phone_number")){info_text+="<tr><td><b>Phone Number</b></td><td>"+place.international_phone_number+"</td></tr>"}
+    		if(place.hasOwnProperty("price_level")){
+    			num=place.price_level;
+    			price_text="";
+    			for(i=0;i<num;i++){
+    				price_text+="$";
+    			}
+    			info_text+="<tr><td><b>Price Level</b></td><td>"+price_text+"</td></tr>"}
+    		if(place.hasOwnProperty("rating")){
+    			star_width=place.rating*$scope.widthofonestar;
+    			//console.log(star_width);
+//                The overflow property specifies whether to clip content or to add scrollbars when an element's content is too big to fit in a specified area.
+    			info_text+="<tr><td><b>Rating</b></td><td>"+"<div><p style='float:left;'>"+place.rating+"</p><p id='star' style='overflow: hidden;color:orange;width:"+star_width+"px;'>&#9733&#9733&#9733&#9733&#9733</p></div></td></tr>"
+    		}
+//            a target specify where to open the new document
+    		if(place.hasOwnProperty("url")){info_text+="<tr><td><b>Google Page</b></td><td><a target='_blank' href='"+place.url+"'>"+place.url+"</a></td></tr>"}
+    		if(place.hasOwnProperty("website")){info_text+="<tr><td><b>Website</b></td><td><a target='_blank' href='"+place.website+"'>"+place.website+"</a></td></tr>"}
+
+    		if(place.hasOwnProperty("opening_hours")){
+                //console.log(place.opening_hours.weekday_text);	
+                //console.log(place.opening_hours.periods);
+                //console.log(place.utc_offset);	
+                    var date=new Date();
+                    if(date.getUTCDay()-1<0){
+                        var utcday=6;
+                    }
+                    else{
+                        var utcday=date.getUTCDay()-1;
+                    }
+                    var utchour=date.getUTCHours();
+                    if(utchour+(place.utc_offset/60)<0){
+                        placeday=utcday-1;
+                    }
+                    else if(utchour+(place.utc_offset/60)>24){
+                        placeday=utcday+1;
+                    }
+                    else{
+                        placeday=utcday;
+                    }
+                    if(placeday<0){placeday=6;}
+                    if(placeday>6){placeday=0;}
+                    //console.log(place.opening_hours.weekday_text[placeday]);
+                    breakpoint=place.opening_hours.weekday_text[placeday].indexOf(":");
+                    openhour=place.opening_hours.weekday_text[placeday].substring(breakpoint+2);
+                    //console.log(openhour);
+                    days=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+                    document.getElementById("day"+0).innerHTML="<th>"+days[placeday]+"</th><th>"+openhour+"</th>";
+                    for(i=1;i<7;i++){
+                        if(placeday+i>6){nextday=placeday+i-7;}
+                        else{nextday=placeday+i}
+                        breakpoint=place.opening_hours.weekday_text[nextday].indexOf(":");
+                        openhour=place.opening_hours.weekday_text[nextday].substring(breakpoint+2);
+                        document.getElementById("day"+i).innerHTML="<td>"+days[nextday]+"</td><td>"+openhour+"</td>";
+                    }
+                    
+
+
+    			if(place.opening_hours.open_now){
+//                    the Modal plugin is a dialog box/popup window that is displayed on top of the current page.
+    				info_text+="<tr><td><b>Hours</b></td><td>Open now: "+openhour+" "+"<a href='' data-toggle='modal' data-target='#mymodal'>Daily open hours</a></td></tr>";
+    			}
+    			else{
+    				info_text+="<tr><td><b>Hours</b></td><td>Closed <a href='' data-toggle='modal' data-target='#mymodal'>Daily open hours</a></td></tr>";
+    			}
+    		}
+            
+    		info_text+="</tbody>";		
+    		document.getElementById("infotable").innerHTML=info_text;
+    		
+            //photos
+            if(place.hasOwnProperty("photos")){
+    			p=place.photos;
+    			photo_text="<div class='card-columns'>";
+    		for(i=0;i<p.length;i++){
+                //console.log(p);
+//                Create responsive images by adding an .img-fluid class to the <img> tag. The image will then scale nicely to the parent element.
+    			photo_text+="<div class='card'><img class='card-img img-fluid' onclick='showfullphoto(this)' src='"+p[i].getUrl({'maxWidth': p[i].width,'maxHeight':p[i].height})+"'></div>";
+    		}
+    		photo_text+="</div>";
+    		document.getElementById('photos').innerHTML=photo_text;
+
+    		}
+    		else{
+    			photo_text="<table class='table'><tr class='table-warning'><td>No records.</td></tr></table>";
+    			document.getElementById('photos').innerHTML=photo_text;
+    			console.log("no photos");
+    		}
+    	   //params for yelp search
+            console.log(place);
+            yelp_name=place.name.replace("/"," ");
+            yelp_address1=place.vicinity;
+            yelp_city=" ";
+            addresscomponent=place.address_components;
+            //console.log(addresscomponent);
+            for(i=0;i<addresscomponent.length;i++){
+                if(addresscomponent[i].types[0]=="country"){
+                    yelp_country=addresscomponent[i].short_name;
+                }
+                if(addresscomponent[i].types[0]=="administrative_area_level_1"){
+                    yelp_state=addresscomponent[i].short_name;
+                }
+                if(addresscomponent[i].types[0]=="locality"){
+                    yelp_city=addresscomponent[i].short_name;
+                    //console.log(yelp_city);
+                }
+            }
+            businessesmatchurl=host+"/yelpmatch/"+yelp_name+"/"+yelp_city+"/"+yelp_state+"/"+yelp_country+"/"+yelp_address1;
+        $http.get(businessesmatchurl)
+        .then(function (response) {
+            console.log(response.data)
+            
+            //console.log("yelpmatch");
+            //console.log(response.data.businesses[0].id); 
+          if(response.data.hasOwnProperty("businesses")){
+            if(response.data.businesses.length>0){
+                console.log("has businesses length: "+response.data.businesses.length);
+                
+            $http.get(host+'/yelpreviews/'+response.data.businesses[0].id)
+            .then(function(yelpreviewsresponse){
+                console.log(yelpreviewsresponse.data)
+                allyelpreviews=yelpreviewsresponse.data.reviews;
+                $scope.yelpreviews=[];
+                for(i=0;i<allyelpreviews.length;i++){
+                    temp={
+                        "name":allyelpreviews[i].user.name,
+                        "image":allyelpreviews[i].user.image_url,
+                        "rating":allyelpreviews[i].rating,
+                        "text":allyelpreviews[i].text,
+                        "createtime":allyelpreviews[i].time_created,
+                        "website":allyelpreviews[i].url,
+                    }
+                    $scope.yelpreviews.push(temp);
+                }
+                //$scope.whichreviews=$scope.yelpreviews;
+                //console.log("yelpreviews "+$scope.whichreviews);
+
+            }); 
+             
+            }
+            else{
+                console.log("no businesses-id");
+                //$scope.noyelpreviews=true;
+                $scope.yelpreviews=[];
+                //$scope.noreviews=true;
+            }  
+          }
+          else{
+                console.log("no businesses attribute");
+                //$scope.noyelpreviews=true;
+                $scope.yelpreviews=[];
+                //$scope.noreviews=true;
+          }
+        });
+
+
+            //console.log("yelpcountry "+yelp_country+" "+yelp_state+" "+yelp_city+" "+yelp_name);
+
+            //googlereviews
+            if(place.hasOwnProperty("reviews")){
+                $scope.googlereviews=[];
+                for(i=0;i<place.reviews.length;i++){
+                    temp={
+                        "name":place.reviews[i].author_name,
+                        "image":place.reviews[i].profile_photo_url,
+                        "website":place.reviews[i].author_url,
+                        "createtime":transformIntoDate(place.reviews[i].time*1000),
+                        "text":place.reviews[i].text,
+                        "rating":place.reviews[i].rating,
+                    }
+                    $scope.googlereviews.push(temp);
+                }
+                $scope.noreviews=false;
+                $scope.whichreviews=$scope.googlereviews;    
+            }
+            else{
+                $scope.whichreviews=[];
+                $scope.noreviews=true;
+            }
+            $scope.placedetail=true;
+            $scope.reviewscontent=true;
+            //$scope.noyelpreviews=false;
+
+
+
+  			}
+		}	
+	}
+
+	$scope.showstreetview=function(){
+		console.log("showstreetview");
+        //initailize a map and get streetview
+        map = new google.maps.Map(document.getElementById('map'), {
+                    center: {lat: endpointlat, lng: endpointlng},
+                    zoom: 15
+                });
+                //console.log(place.geometry.location.lat());
+                var marker = new google.maps.Marker({
+                    map: map,
+                    position: position,
+                });
+//        The StreetViewPanorama constructor also allows you to set the Street View location and point of view using the StreetViewOptions parameter. You may call setPosition() and setPov() on the object after construction to change its location and POV.
+		panorama = map.getStreetView();
+        		panorama.setPosition(astorPlace);
+        		panorama.setPov(/** @type {google.maps.StreetViewPov} */({
+          			heading: 265,
+          			pitch: 0
+        		}));
+
+		var toggle = panorama.getVisible();
+        if (toggle == false) {
+          panorama.setVisible(true);
+          $scope.isstreet = true;
+          document.getElementById("pegman").src="http://cs-server.usc.edu:45678/hw/hw8/images/Map.png";
+        } else {
+          panorama.setVisible(false);
+          $scope.isstreet = false;
+          document.getElementById("pegman").src="http://cs-server.usc.edu:45678/hw/hw8/images/Pegman.png";
+        }
+	}
+
+	$scope.getdirection=function(){
+		console.log($scope.startpoint+$scope.endpoint);
+		$scope.isstreet=false;
+		travelmode=$scope.travelmode;
+		if($scope.startpoint==null||$scope.startpoint=="My location"||$scope.startpoint=="Your location"){
+			startpointlat=$scope.userlat;
+			startpointlng=$scope.userlon;
+			initMap();
+			return;
+		}
+		else{
+			directionurl=host+'/geocoding/'+$scope.startpoint;
+       		$http.get(directionurl)
+			.then(function successCallback(dirresponse) {
+			startpointlat=dirresponse.data.results[0].geometry.location.lat;
+			startpointlng=dirresponse.data.results[0].geometry.location.lng;
+			$scope.$applyAsync();
+			initMap();
+			return;
+			});	
+		}	
+	}
+
+	$scope.fullphoto=function(){
+		window.open(t.src);
+	}
+
+/*
+	$http({
+		method: 'GET',
+		url: 'http://localhost:8081/places/'+$scope.keyword+'/default/16090/34.0035/-118.2873'
+	}).then(function successCallback(response) {
+			$scope.names = response.data.sites;
+		}, function errorCallback(response) {
+			// 请求失败执行代码
+	});
+*/
+
+	$scope.searchplace=function(){
+        $scope.nxtbtn=false;
+
+		if(document.getElementById('keyword').value==""){return;}
+		otherlocation=document.getElementById("otherlocation").value;
+		if(otherlocation==""&&myform.location.value=="somewhere"){return;}
+		$scope.start=false;
+		$scope.norecords=false;
+        $scope.Detailsdisable=true;
+//        failed参数代表断网
+        $scope.failed=false;
+//        aaa代表显示的结果那一个表
+        //document.getElementById('aaa').style.display="none";
+        $scope.searchtable=true;
+        $scope.placedetail=false;
+		$scope.progressbar=true;
+		//console.log(myform.location.value);
+		var radius1=16090;
+		if(document.getElementById('distance').value!=''){radius1=$scope.distance*1609;}
+
+        var radios=document.getElementsByName("location");
+        if(radios[0].checked!=true){
+            $scope.startpoint=otherlocation; //direction start location
+       		console.log("fromsomewhere");
+       		geocodingurl=host+'/geocoding/'+otherlocation;
+//             用http请求url然后获得返回的数据。
+       		$http.get(geocodingurl)
+			.then(function successCallback(georesponse) {
+              if(georesponse.data.results.length>0){
+				otherlocationlat=georesponse.data.results[0].geometry.location.lat;
+				otherlocationlon=georesponse.data.results[0].geometry.location.lng;
+				$scope.lat=otherlocationlat;
+        		$scope.lon=otherlocationlon;
+
+        		url=host+'/places/'+$scope.keyword+'/'+$scope.category+'/'+radius1+'/'+$scope.lat+'/'+$scope.lon;
+				$http.get(url)
+				.then(function successCallback(response) {
+					//wait for response
+		   			$scope.progressbar=false;
+					$scope.page1 = response.data.results;
+					if($scope.page1.length==0){
+						console.log("no results");
+						$scope.norecords=true;
+					return;
+					}
+				$scope.allpage=[];
+				$scope.allpage.push($scope.page1);
+			
+				$scope.currentpage=0;
+				$scope.page=$scope.allpage[$scope.currentpage];
+				//$scope.searchtable=true;
+                document.getElementById('aaa').style.display="block";
+				$scope.prebtn=false;
+				if(response.data.hasOwnProperty("next_page_token")){
+					console.log("more page");
+					$scope.nxtbtn=true;
+
+					$scope.nptoken=response.data.next_page_token;			
+				}
+				else{
+					$scope.nptoken=null;
+				}
+				},function errorCallback(response) {
+					console.log("error");
+                    $scope.progressbar=false;
+                    $scope.failed=true;
+		        });
+              }
+              else{
+                $scope.progressbar=false;
+                $scope.norecords=true;
+              }
+			});
+       	}
+       	else{
+       		$scope.startpoint="Your location"; //map direction start point
+            console.log("fromcurrent");
+       		$scope.lat=$scope.userlat;
+			$scope.lon=$scope.userlon;
+			url=host+'/places/'+$scope.keyword+'/'+$scope.category+'/'+radius1+'/'+$scope.lat+'/'+$scope.lon;
+            
+			$http.get(url)
+			.then(function successCallback(response) {
+		
+		    $scope.progressbar=false;
+			$scope.page1 = response.data.results;
+			if($scope.page1.length==0){
+				console.log("no results");
+				$scope.norecords=true;
+				return;
+			}
+			$scope.allpage=[];
+			$scope.allpage.push($scope.page1);
+			
+			$scope.currentpage=0;
+			$scope.page=$scope.allpage[$scope.currentpage];
+			//$scope.searchtable=true;
+            document.getElementById('aaa').style.display="block";
+			$scope.prebtn=false;
+			if(response.data.hasOwnProperty("next_page_token")){
+				console.log("more page");
+				$scope.nxtbtn=true;
+				$scope.nptoken=response.data.next_page_token;			
+			}
+			else{
+				$scope.nptoken=null;
+			}
+		},function errorCallback(response) {
+			console.log("error");
+            $scope.progressbar=false;
+            $scope.failed=true;
+		});
+       	} 
+        //$scope.keyword="donothing";    	
+	}
+	
+	//get current userip
+	$http.get('http://ip-api.com/json')
+    .then(function (response) {
+            $scope.userlat = response.data.lat;
+            $scope.userlon = response.data.lon;
+            $scope.iplocation=true;
+            console.log("current location"+$scope.userlat+" "+$scope.userlon);      
+        });
+
+    $scope.radio_disable =function(){
+            var radios=document.getElementsByName("location");
+            if(radios[0].checked==true){
+                document.getElementById("otherlocation").setAttribute("disabled","disabled");
+                if(document.getElementById('keyword').value!=""){
+                    document.getElementById("search").removeAttribute("disabled");
+                }
+//                angularjs改变的是值，而jquery和js改变的是特性，attribute,change1意味着点进去又点出来
+                $scope.change1=false;
+                $("#otherlocation").removeClass("ng-touched");  
+                
+                $scope.chosen=false;
+            }
+            else{    
+                $scope.chosen=true;
+                document.getElementById("otherlocation").removeAttribute("disabled"); 
+            } 
+            
+        }
+
+    
+  
+});
+
+function initMap(){
+	//console.log("initMap start"+startpointlat+" "+startpointlng+" end "+endpointlat+" "+endpointlng);
+	var directionsDisplay = new google.maps.DirectionsRenderer;
+        var directionsService = new google.maps.DirectionsService;
+        var map1 = new google.maps.Map(document.getElementById('map'), {
+          zoom: 14,
+          center: {lat: startpointlat*1, lng: startpointlng*1}
+        }
+        );
+        directionsDisplay.setMap(map1);
+        calculateAndDisplayRoute(directionsService, directionsDisplay);
+}
+
+function calculateAndDisplayRoute(directionsService, directionsDisplay) {       		
+        directionsService.route({
+          origin: {lat: startpointlat*1, lng: startpointlng*1},  
+          destination: {lat: endpointlat*1, lng: endpointlng*1},          
+          travelMode: travelmode,
+          provideRouteAlternatives: true,
+        }, function(response, status) {
+          if (status == 'OK') {
+            directionsDisplay.setDirections(response);
+
+            document.getElementById("directionsPanel").innerHTML=""; //clear former route
+//              A DirectionsRenderer not only handles display of the polyline and any associated markers, but also can handle the textual display of directions as a series of steps. To do so, simply call setPanel() on your DirectionsRenderer
+            directionsDisplay.setPanel(document.getElementById('directionsPanel'));
+          } else {
+            window.alert('Directions request failed due to ' + status);
+          }
+        });
+}
+
+</script>
+
+</body>
+
+<script type="text/javascript">
+    function add0(m){return m<10?'0'+m:m } 
+
+    function transformIntoDate(timestamp) {  
+        
+        var time = new Date(timestamp);  
+        var y = time.getFullYear();  
+        var m = time.getMonth()+1;  
+        var d = time.getDate();  
+        var h = time.getHours();  
+        var mm = time.getMinutes();  
+        var s = time.getSeconds();  
+        //console.log(y+'-'+add0(m)+'-'+add0(d)+' '+add0(h)+':'+add0(mm)+':'+add0(s));
+        return y+'-'+add0(m)+'-'+add0(d)+' '+add0(h)+':'+add0(mm)+':'+add0(s);  
+    } 
+
+//    Autocomplete adds a text input field to your web page, and monitors that field for character entries. As the user enters text, autocomplete returns place predictions in the form of a dropdown pick list. When the user selects a place from the list, information about the place is returned to the autocomplete object, and can be retrieved by your application.
+    var placeSearch, autocomplete;
+    var componentForm = {
+        street_number: 'short_name',
+        route: 'long_name',
+        locality: 'long_name',
+        administrative_area_level_1: 'short_name',
+        country: 'long_name',
+        postal_code: 'short_name'
+    };
+
+    function initAutocomplete() {
+        // Create the autocomplete object, restricting the search to geographical
+        // location types.
+        autocomplete = new google.maps.places.Autocomplete(
+            /** @type {!HTMLInputElement} */(document.getElementById('otherlocation')),
+            {types: ['geocode']});
+
+        // When the user selects an address from the dropdown, populate the address
+        // fields in the form.
+        //autocomplete.addListener('place_changed', fillInAddress);
+        autocomplete1 = new google.maps.places.Autocomplete(
+            /** @type {!HTMLInputElement} */(document.getElementById('startlocation')),
+            {types: ['geocode']});
+    }
+
+      
+    function geolocate() {
+//        navigator 是浏览器自带的，可以直接识别地点
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            var geolocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            var circle = new google.maps.Circle({
+              center: geolocation,
+              radius: position.coords.accuracy
+            });
+            autocomplete.setBounds(circle.getBounds());
+            autocomplete1.setBounds(circle.getBounds());
+          });
+        }
+    }
+
+    function showfullphoto(t){
+      	//console.log("show");
+		window.open(t.src);
+    }
+
+</script>
+</html>
